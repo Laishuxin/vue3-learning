@@ -1,0 +1,24 @@
+{
+  "name": "mini-vue",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "release": "standard-version",
+    "open": "node scripts/open.js reactivity ",
+    "dev": "node scripts/dev.js reactivity global",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.14.43",
+    "minimist": "^1.2.6",
+    "open": "^8.4.0",
+    "typescript": "^4.7.3"
+  },
+  "devDependencies": {
+    "standard-version": "^9.5.0"
+  }
+}
