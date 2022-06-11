@@ -27,6 +27,19 @@ var VueReactivity = (() => {
   // packages/shared/src/index.ts
   var isObject = (v) => typeof v === "object" && v !== null;
 
+  // baseHandler.ts
+  var mutableHandlers = {
+    get(target, key, receiver) {
+      if (key === "__v_isReactive" /* IS_REACTIVE */) {
+        return true;
+      }
+      return Reflect.get(target, key, receiver);
+    },
+    set(target, key, value, receiver) {
+      return Reflect.set(target, key, value, receiver);
+    }
+  };
+
   // packages/reactivity/src/warn.ts
   function warn(msg, ...args) {
     console.warn(`Vue warn ${msg}: `, ...args);
@@ -39,24 +52,14 @@ var VueReactivity = (() => {
       warn("reactive", `target should be an object`);
       return;
     }
-    if (target["__v_is_reactive" /* IS_REACTIVE */]) {
+    if (target["__v_isReactive" /* IS_REACTIVE */]) {
       return target;
     }
     const existingProxy = reactiveMap.get(target);
     if (existingProxy) {
       return existingProxy;
     }
-    const proxy = new Proxy(target, {
-      get(target2, key, receiver) {
-        if (key === "__v_is_reactive" /* IS_REACTIVE */) {
-          return true;
-        }
-        return Reflect.get(target2, key, receiver);
-      },
-      set(target2, key, value, receiver) {
-        return Reflect.set(target2, key, value, receiver);
-      }
-    });
+    const proxy = new Proxy(target, mutableHandlers);
     reactiveMap.set(target, proxy);
     return proxy;
   }
