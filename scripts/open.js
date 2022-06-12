@@ -6,7 +6,12 @@ const file = args.f || 'index.html'
 
 // Opens the URL in the default browser.
 async function main() {
-  await open(resolve(__dirname, `../packages/${target}/__demo__/${file}`))
+  await open(
+    resolve(__dirname, `../packages/${target}/__demo__/${file}.html`),
+    {
+      newInstance: true,
+    },
+  )
   console.log(
     'open: ',
     resolve(__dirname, `../packages/${target}/__demo__/${file}`),

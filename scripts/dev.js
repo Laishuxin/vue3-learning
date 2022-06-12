@@ -29,6 +29,7 @@ esbuild
     watch: {
       onRebuild(error) {
         if (error) console.warn('onRebuild err: ', error)
+        else console.log('rebuild...')
       },
     },
   })
