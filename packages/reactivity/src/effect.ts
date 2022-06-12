@@ -16,7 +16,7 @@ class ReactiveEffect {
   // is activated?
   // if false, run collecting dependencies
   public active = true
-  constructor(public fn) {}
+  constructor(public fn, public scheduler) {}
   public parent: any
   public deps: Set<any>[] = []
 
@@ -31,19 +31,29 @@ class ReactiveEffect {
       this.parent = activeEffect
       activeEffect = this
       cleanup(this)
-      return this.fn()
+      this.fn()
     } finally {
       activeEffect = this.parent
       this.parent = null
     }
   }
+  stop() {
+    if (this.active) {
+      this.active = false
+      cleanup(this)
+    }
+  }
 }
 
-export function effect(fn, options = {}) {
+export function effect(fn, options: any = {}) {
   // 可以根据状态发生变化，同时 effect 可以嵌套。
-  const _effect = new ReactiveEffect(fn)
+  const _effect = new ReactiveEffect(fn, options.scheduler)
+  const runner = _effect.run.bind(_effect)
+  runner.effect = _effect
 
   _effect.run()
+
+  return runner
 }
 
 const targetMap = new WeakMap<any, Map<string, Set<ReactiveEffect>>>()
@@ -75,7 +85,13 @@ export function trigger(target, type, key, value, oldValue) {
   if (effects) {
     const _effects = new Set(effects)
     _effects.forEach((effect) => {
-      if (effect !== activeEffect) effect.run()
+      if (effect !== activeEffect) {
+        if (effect.scheduler) {
+          effect.scheduler()
+        } else {
+          effect.run()
+        }
+      }
     })
   }
 }
