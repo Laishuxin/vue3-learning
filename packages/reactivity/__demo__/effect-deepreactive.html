@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>reactive deep reactive</h1>
+
+    <script src="../dist/reactivity.global.js"></script>
+    <!-- <script src="../../../node_modules/@vue/reactivity/dist/reactivity.global.js"></script> -->
+  </body>
+
+  <script>
+    const { reactive, effect } = VueReactivity
+    const state = reactive({
+      flag: true,
+      name: 'state_name',
+      age: 18,
+      payload: {
+        girlFriend: 'Lisa',
+      },
+    })
+
+    const render = () => {
+      document.body.innerHTML = `girlFriend: ${state.payload.girlFriend}`
+    }
+
+    effect(() => {
+      render()
+    })
+    setTimeout(() => {
+      state.payload.girlFriend = 'Alisa'
+    }, 1000)
+  </script>
+</html>

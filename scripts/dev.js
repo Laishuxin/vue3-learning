@@ -16,6 +16,7 @@ const outfile = resolve(
   __dirname,
   `../packages/${target}/dist/${target}.${format}.js`,
 )
+let count = 1
 
 esbuild
   .build({
@@ -29,7 +30,7 @@ esbuild
     watch: {
       onRebuild(error) {
         if (error) console.warn('onRebuild err: ', error)
-        else console.log('rebuild...')
+        else console.log(`${new Date()}: rebuild: ${count++}`)
       },
     },
   })
