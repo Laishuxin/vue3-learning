@@ -12,7 +12,7 @@ function cleanup(effect: ReactiveEffect) {
   // effect.deps.length = 0
 }
 
-class ReactiveEffect {
+export class ReactiveEffect {
   // is activated?
   // if false, run collecting dependencies
   public active = true
@@ -31,7 +31,7 @@ class ReactiveEffect {
       this.parent = activeEffect
       activeEffect = this
       cleanup(this)
-      this.fn()
+      return this.fn()
     } finally {
       activeEffect = this.parent
       this.parent = null
@@ -69,6 +69,10 @@ export function track(target, type, key) {
   if (!deps) {
     depsMap.set(key, (deps = new Set()))
   }
+  trackEffect(deps)
+}
+
+export function trackEffect(deps) {
   let shouldTrack = !deps.has(activeEffect)
   if (shouldTrack) {
     deps.add(activeEffect)
@@ -83,15 +87,19 @@ export function trigger(target, type, key, value, oldValue) {
   const effects = depsMap.get(key)
 
   if (effects) {
-    const _effects = new Set(effects)
-    _effects.forEach((effect) => {
-      if (effect !== activeEffect) {
-        if (effect.scheduler) {
-          effect.scheduler()
-        } else {
-          effect.run()
-        }
-      }
-    })
+    triggerEffects(effects)
   }
+}
+
+export function triggerEffects(effects) {
+  const _effects = new Set<any>(effects)
+  _effects.forEach((effect) => {
+    if (effect !== activeEffect) {
+      if (effect.scheduler) {
+        effect.scheduler()
+      } else {
+        effect.run()
+      }
+    }
+  })
 }
